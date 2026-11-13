@@ -484,6 +484,8 @@ def reset_demo():
     log_event("SYSTEM_RESET", "Demo system state reset by administrator.", "NOTICE", request.remote_addr)
     return jsonify({"success": True, "message": "System database reset to initial fresh election state."})
 
+# Initialize the database immediately upon module load (required for Gunicorn / Render production workers)
+init_db()
+
 if __name__ == "__main__":
-    init_db()
     app.run(host="127.0.0.1", port=5000, debug=True)
