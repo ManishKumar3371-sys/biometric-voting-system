@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>National Biometric Electronic Voting System | Secure Polling Terminal</title>
+  <!-- FontAwesome Icons for official symbols -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div class="official-crest">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div>
+        <div class="brand-title">
+          <span>NATIONAL ELECTORAL COMMISSION</span>
+          <span class="badge-official">AUTHENTICATED TERMINAL</span>
+        </div>
+        <div class="brand-subtitle">
+          Secure Biometric eVoting & Cryptographic Ledger System (SEC-EVT 4.2)
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-status-indicators">
+      <div class="status-pill">
+        <i class="fa-solid fa-location-dot" style="color: #38bdf8;"></i>
+        <span id="boothCodeLabel">ECI-BOOTH-094</span>
+      </div>
+      <div class="status-pill">
+        <div class="pulse-dot"></div>
+        <span id="systemStatusLabel">POLL ACTIVE & ENCRYPTED</span>
+      </div>
+      <button class="btn btn-outline" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;" onclick="resetDemoState()">
+        <i class="fa-solid fa-arrow-rotate-right"></i> Reset Demo Roll
+      </button>
+    </div>
+  </header>
+
+  <!-- Sub Navigation Tabs -->
+  <nav class="tab-navigation">
+    <button class="tab-btn active" onclick="switchTab('terminalView', this)">
+      <i class="fa-solid fa-fingerprint"></i> Biometric Voting Booth (Kiosk)
+    </button>
+    <button class="tab-btn" onclick="switchTab('rosterView', this)">
+      <i class="fa-solid fa-address-card"></i> Registered Electoral Roll
+    </button>
+    <button class="tab-btn" onclick="switchTab('ledgerView', this)">
+      <i class="fa-solid fa-link"></i> Tamper-Evident Merkle Ledger
+    </button>
+    <button class="tab-btn" onclick="switchTab('analyticsView', this)">
+      <i class="fa-solid fa-chart-pie"></i> Real-time Tally & Turnout
+    </button>
+    <button class="tab-btn" onclick="switchTab('securityAuditView', this)">
+      <i class="fa-solid fa-user-shield"></i> Security & Intrusion Logs
+    </button>
+  </nav>
+
+  <!-- Main Work Area -->
+  <main class="main-content">
+
+    <!-- 1. BIOMETRIC KIOSK & VOTING TERMINAL -->
+    <section id="terminalView" class="view-panel active-panel">
+      <div class="grid-2col">
+
+        <!-- Left Column: Kiosk Terminal Controller -->
+        <div class="card kiosk-panel">
+          <div class="kiosk-header-bar">
+            <div>
+              <span class="terminal-badge"><i class="fa-solid fa-terminal"></i> KIOSK HWID: SEC-TERM-7701</span>
+            </div>
+            <div style="font-size: 0.75rem; color: #94a3b8;">
+              SHA-256 Vector Pipeline: <span style="color:#10b981; font-weight:600;">ARMED</span>
+            </div>
+          </div>
+
+          <!-- Progress Stepper -->
+          <div class="step-indicator-bar">
+            <div class="step-item active" id="stepIndicator1">
+              <div class="step-circle">1</div>
+              <div class="step-label">Identify</div>
+            </div>
+            <div class="step-item" id="stepIndicator2">
+              <div class="step-circle">2</div>
+              <div class="step-label">Biometrics</div>
+            </div>
+            <div class="step-item" id="stepIndicator3">
+              <div class="step-circle">3</div>
+              <div class="step-label">Secret Ballot</div>
+            </div>
+            <div class="step-item" id="stepIndicator4">
+              <div class="step-circle">4</div>
+              <div class="step-label">VVPAT Audit</div>
+            </div>
+          </div>
+
+          <!-- STAGE 1: VOTER ID ENTRY -->
+          <div id="stage1" class="kiosk-stage active">
+            <h3 style="margin-bottom: 0.5rem; font-size: 1.15rem;">Voter Identification & Registry Lookup</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">
+              Present EPIC Card / National Electoral ID or select an enrolled test citizen from the electoral roster to verify eligibility.
+            </p>
+
+            <div style="margin-bottom: 1rem;">
+              <label style="display:block; font-size: 0.8rem; font-weight:600; margin-bottom: 0.35rem; color: #cbd5e1;">
+                VOTER REGISTRATION NUMBER (EPIC ID)
+              </label>
+              <div style="display: flex; gap: 0.5rem;">
+                <input type="text" id="voterIdInput" class="form-input" placeholder="e.g. VTR-882901" value="VTR-882901" style="font-family: var(--terminal-font); text-transform: uppercase;">
+                <button class="btn btn-outline" style="white-space: nowrap;" onclick="quickFillRandomVoter()">
+                  <i class="fa-solid fa-dice"></i> Pick Voter
+                </button>
+              </div>
+            </div>
+
+            <!-- Pre-selection hints -->
+            <div style="background: rgba(15,23,42,0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 1.5rem;">
+              <span style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.4rem;">
+                <i class="fa-solid fa-circle-info" style="color: #38bdf8;"></i> Enrolled sample voters available in test registry:
+              </span>
+              <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;" id="quickVoterBadges">
+                <!-- Populated via JS -->
+              </div>
+            </div>
+
+            <button class="btn btn-primary" style="width: 100%;" onclick="proceedToBiometrics()">
+              Proceed to Dual Biometric Scan <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- STAGE 2: DUAL BIOMETRIC AUTHENTICATION -->
+          <div id="stage2" class="kiosk-stage">
+            <h3 style="margin-bottom: 0.4rem; font-size: 1.15rem;">Dual Multi-Modal Biometric Verification</h3>
+            <p style="font-size: 0.85rem; color: #94a3b8;">
+              Live scanning optical fingerprint and facial landmark recognition vector against government cryptographic ledger.
+            </p>
+
+            <div class="scanner-container">
+              <!-- Fingerprint Module -->
+              <div class="scan-box" id="fingerprintScannerBox" onclick="simulateFingerprintScan()">
+                <div class="scanner-beam"></div>
+                <div class="scan-icon"><i class="fa-solid fa-fingerprint"></i></div>
+                <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">Optical Fingerprint</div>
+                <div class="scan-status-text" id="fpStatusText">Click to place thumb</div>
+              </div>
+
+              <!-- Face / Iris Module -->
+              <div class="scan-box" id="facialScannerBox" onclick="simulateFacialScan()">
+                <div class="scanner-beam"></div>
+                <div class="scan-icon"><i class="fa-solid fa-id-badge"></i></div>
+                <div style="font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem;">Facial Recognition</div>
+                <div class="scan-status-text" id="faceStatusText">Click to align sensor</div>
+              </div>
+            </div>
+
+            <!-- Biometric Match Live Status -->
+            <div id="bioFeedbackAlert" style="display: none;"></div>
+
+            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
+              <button class="btn btn-outline" style="flex: 1;" onclick="resetKioskToStage1()">
+                <i class="fa-solid fa-arrow-left"></i> Change Voter ID
+              </button>
+              <button class="btn btn-primary" id="btnVerifyBiometrics" style="flex: 2;" onclick="executeBiometricVerification()">
+                <i class="fa-solid fa-shield-check"></i> Authenticate Biometrics
+              </button>
+            </div>
+          </div>
+
+          <!-- STAGE 3: ELECTRONIC BALLOT UNIT (VOTING INTERFACE) -->
+          <div id="stage3" class="kiosk-stage">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+              <div>
+                <h3 style="font-size: 1.15rem;">Official Digital Ballot Unit</h3>
+                <p style="font-size: 0.8rem; color: #94a3b8;">Cast vote. Voter identity is decoupled cryptographically for strict ballot secrecy.</p>
+              </div>
+              <span class="status-tag status-success" style="font-size: 0.75rem;">
+                <i class="fa-solid fa-lock"></i> Booth Authorized
+              </span>
+            </div>
+
+            <!-- Verified Voter Header Snippet -->
+            <div id="verifiedVoterHeader" class="voter-dossier" style="margin: 0.5rem 0 1rem 0; padding: 0.75rem 1rem;">
+              <div class="dossier-avatar" style="width: 48px; height: 48px; font-size: 1.5rem;">
+                <i class="fa-solid fa-user-check" style="color: #10b981;"></i>
+              </div>
+              <div>
+                <h4 id="authVoterName" style="font-size: 0.95rem; margin-bottom: 0.1rem;">-</h4>
+                <div style="font-size: 0.75rem; color: #94a3b8;">
+                  EPIC: <span id="authVoterId" style="font-family: var(--terminal-font); color:#38bdf8;">-</span> | 
+                  District: <span id="authVoterConst">-</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Candidates Ballot Options -->
+            <div class="ballot-list" id="candidatesBallotContainer">
+              <!-- Dynamically populated candidate options -->
+            </div>
+
+            <div style="margin-top: 1.25rem;">
+              <button class="btn btn-success" id="btnSubmitVote" style="width: 100%; font-size: 1rem; padding: 0.85rem;" onclick="submitBallot()" disabled>
+                <i class="fa-solid fa-check-to-slot"></i> Cast Ballot & Record to Ledger
+              </button>
+            </div>
+          </div>
+
+          <!-- STAGE 4: VVPAT AUDIT & DIGITAL CONFIRMATION -->
+          <div id="stage4" class="kiosk-stage">
+            <div style="text-align: center; margin-bottom: 1.5rem;">
+              <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(16, 185, 129, 0.2); border: 2px solid #10b981; display:flex; align-items:center; justify-content:center; margin: 0 auto 0.75rem; font-size: 1.8rem; color: #10b981;">
+                <i class="fa-solid fa-check"></i>
+              </div>
+              <h3 style="font-size: 1.3rem;">Vote Successfully Registered!</h3>
+              <p style="font-size: 0.85rem; color: #94a3b8;">Your vote has been cryptographically sealed and written to the immutable block ledger.</p>
+            </div>
+
+            <!-- Realistic Printed VVPAT Paper Receipt -->
+            <div class="receipt-paper" id="vvpatSlip">
+              <div class="receipt-header">
+                <div style="font-size: 0.7rem; color: #666; font-weight: 700;">OFFICIAL ELECTION COMMISSION OF INDIA</div>
+                <h3>VVPAT PAPER AUDIT RECORD</h3>
+                <div style="font-size: 0.65rem; color: #555;">ZERO-KNOWLEDGE VOTER VERIFIABLE AUDIT SLIP</div>
+              </div>
+
+              <div class="receipt-row">
+                <span>SERIAL SLIP NO:</span>
+                <span id="vvpatSlipNum" style="font-weight: 700;">-</span>
+              </div>
+              <div class="receipt-row">
+                <span>TIMESTAMP (UTC):</span>
+                <span id="vvpatTimestamp">-</span>
+              </div>
+              <div class="receipt-row">
+                <span>POLLING BOOTH ID:</span>
+                <span id="vvpatBooth">-</span>
+              </div>
+              <div class="receipt-row">
+                <span>BALLOT CANDIDATE:</span>
+                <span id="vvpatCandidate" style="font-weight: 800; color: #000;">-</span>
+              </div>
+              <div class="receipt-row">
+                <span>AFFILIATED PARTY:</span>
+                <span id="vvpatParty">-</span>
+              </div>
+              <div class="receipt-row">
+                <span>LEDGER BLOCK #:</span>
+                <span id="vvpatBlockIndex" style="font-weight: 700;">-</span>
+              </div>
+
+              <div class="receipt-hash-box">
+                <div style="font-size: 0.65rem; font-weight:700; margin-bottom: 0.2rem;">CRYPTOGRAPHIC MERKLE BLOCK HASH:</div>
+                <div id="vvpatBlockHash" style="font-size: 0.65rem; color: #1e293b;">-</div>
+              </div>
+
+              <div style="margin-top: 0.75rem; text-align: center; font-size: 0.65rem; color: #64748b;">
+                * This cryptographic token proves inclusion in the ledger without exposing your identity.
+              </div>
+            </div>
+
+            <div style="margin-top: 1.5rem;">
+              <button class="btn btn-primary" style="width: 100%;" onclick="nextVoterKioskReset()">
+                <i class="fa-solid fa-user-plus"></i> Prepare Booth for Next Voter
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Security Engine & Architecture Inspector -->
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          
+          <!-- Architecture Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-network-wired" style="color: #38bdf8;"></i> Anti-Fraud & Cryptographic Architecture
+              </div>
+              <span class="badge-official">ISO/IEC 27001</span>
+            </div>
+            
+            <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1rem;">
+              How this genuine biometric terminal ensures zero duplicate voting and ballot privacy:
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <div style="background: rgba(15,23,42,0.7); padding: 0.75rem 1rem; border-radius: 8px; border-left: 3px solid #38bdf8;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #f8fafc;">1. Decentralized Hash Matching</div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">
+                  Raw fingerprints/faces are never stored. Only irreversible SHA-256 minutiae vectors are hashed and verified locally.
+                </div>
+              </div>
+
+              <div style="background: rgba(15,23,42,0.7); padding: 0.75rem 1rem; border-radius: 8px; border-left: 3px solid #f43f5e;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #f8fafc;">2. Strict Duplicate Voting Lockout</div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">
+                  Upon biometric confirmation, the voter record is flagged atomically. Re-presenting the same ID or fingerprint triggers an immediate security lockdown.
+                </div>
+              </div>
+
+              <div style="background: rgba(15,23,42,0.7); padding: 0.75rem 1rem; border-radius: 8px; border-left: 3px solid #10b981;">
+                <div style="font-size: 0.85rem; font-weight: 600; color: #f8fafc;">3. Anonymized Merkle Audit Chain</div>
+                <div style="font-size: 0.78rem; color: #94a3b8;">
+                  The vote is detached from the voter's identity prior to recording. Each block is cryptographically linked to the previous block's SHA-256 hash.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Interactive Tester / Fraud Simulator -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">
+                <i class="fa-solid fa-flask-vial" style="color: #f59e0b;"></i> Security Threat Simulation Lab
+              </div>
+              <span class="status-tag status-warning">Testing Sandbox</span>
+            </div>
+            
+            <p style="font-size: 0.82rem; color: #94a3b8; margin-bottom: 0.75rem;">
+              Test defensive mechanisms by simulating typical voting threats:
+            </p>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem;">
+              <button class="btn btn-outline" style="font-size: 0.78rem; padding: 0.6rem;" onclick="simulateDuplicateVoteAttack()">
+                <i class="fa-solid fa-triangle-exclamation" style="color: #f43f5e;"></i> Test Duplicate Vote
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.78rem; padding: 0.6rem;" onclick="simulateBiometricMismatchAttack()">
+                <i class="fa-solid fa-user-xmark" style="color: #f59e0b;"></i> Test Spoofed Biometric
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.78rem; padding: 0.6rem;" onclick="simulateGhostVoterAttack()">
+                <i class="fa-solid fa-ghost" style="color: #a855f7;"></i> Test Ghost Voter ID
+              </button>
+              <button class="btn btn-outline" style="font-size: 0.78rem; padding: 0.6rem;" onclick="verifyLedgerIntegrity()">
+                <i class="fa-solid fa-check-double" style="color: #10b981;"></i> Audit Merkle Integrity
+              </button>
+            </div>
+
+            <div id="simulationFeedback" style="margin-top: 0.75rem; font-size: 0.8rem; font-family: var(--terminal-font); display: none;"></div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2. REGISTERED ELECTORAL ROLL -->
+    <section id="rosterView" class="view-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <i class="fa-solid fa-address-book" style="color: #38bdf8;"></i> Official Electoral Roll & Citizen Enrollment
+            </div>
+            <div class="card-subtitle">Constituency 14 - Central Metro Parliamentary Division</div>
+          </div>
+          <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="loadVoterRoster()">
+            <i class="fa-solid fa-rotate"></i> Refresh Roster
+          </button>
+        </div>
+
+        <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 1.25rem;">
+          Real-time polling state of citizens enrolled at this booth. Once a citizen successfully authenticates and votes, their status changes irreversibly to <span class="status-tag status-success">VOTED</span>.
+        </p>
+
+        <div class="ledger-table-container">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>EPIC ID</th>
+                <th>Full Legal Name</th>
+                <th>Date of Birth</th>
+                <th>Gender</th>
+                <th>Constituency</th>
+                <th>Phone (Masked)</th>
+                <th>Franchise Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="voterRosterTbody">
+              <!-- Dynamically rendered -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. TAMPER-EVIDENT MERKLE LEDGER -->
+    <section id="ledgerView" class="view-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <i class="fa-solid fa-cubes-stacked" style="color: #38bdf8;"></i> Cryptographic Vote Blockchain & Merkle Tree
+            </div>
+            <div class="card-subtitle">Append-only immutable record. Every vote is signed with previous block hash.</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="verifyLedgerIntegrity()">
+              <i class="fa-solid fa-shield-halved" style="color: #10b981;"></i> Run Full Cryptographic Audit
+            </button>
+            <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="loadLedgerData()">
+              <i class="fa-solid fa-rotate"></i> Refresh
+            </button>
+          </div>
+        </div>
+
+        <div id="ledgerAuditStatusBanner" class="alert-box alert-success" style="display: none;">
+          <i class="fa-solid fa-circle-check"></i>
+          <span id="ledgerAuditStatusText">All blocks verified. Merkle chain unbroken.</span>
+        </div>
+
+        <div class="ledger-table-container">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Block #</th>
+                <th>Timestamp (UTC)</th>
+                <th>Previous Block Hash</th>
+                <th>Vote Receipt Hash</th>
+                <th>Candidate ID</th>
+                <th>Station</th>
+                <th>Current Merkle Hash</th>
+              </tr>
+            </thead>
+            <tbody id="ledgerTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. REAL-TIME TALLY & TURNOUT -->
+    <section id="analyticsView" class="view-panel">
+      <div class="grid-3col" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">TOTAL ELECTORAL ROLL</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #38bdf8;" id="statsTotalVoters">0</div>
+          <div style="font-size: 0.75rem; color: #64748b;">Registered citizens in district</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">BALLOTS CAST TO LEDGER</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #10b981;" id="statsTotalVoted">0</div>
+          <div style="font-size: 0.75rem; color: #64748b;">Verified biometric submissions</div>
+        </div>
+        <div class="card">
+          <div style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 0.25rem;">VOTER TURNOUT PERCENT</div>
+          <div style="font-size: 1.8rem; font-weight: 700; color: #f59e0b;" id="statsTurnoutPct">0.0%</div>
+          <div style="font-size: 0.75rem; color: #64748b;">Live participation rate</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <i class="fa-solid fa-square-poll-vertical" style="color: #38bdf8;"></i> Live Candidate Tally & Preference Share
+            </div>
+            <div class="card-subtitle">Encrypted accumulator results updated in real time</div>
+          </div>
+          <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="loadTallyResults()">
+            <i class="fa-solid fa-rotate"></i> Refresh Results
+          </button>
+        </div>
+
+        <div id="candidateTallyContainer" style="margin-top: 1rem;">
+          <!-- Dynamically populated tally bars -->
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. SECURITY & INTRUSION AUDIT LOGS -->
+    <section id="securityAuditView" class="view-panel">
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">
+              <i class="fa-solid fa-shield-virus" style="color: #f43f5e;"></i> Security Event & Intrusion Detection Log
+            </div>
+            <div class="card-subtitle">Real-time log of biometric authentication attempts, duplicate voting flags, and access audits.</div>
+          </div>
+          <button class="btn btn-outline" style="font-size: 0.8rem;" onclick="loadSecurityLogs()">
+            <i class="fa-solid fa-rotate"></i> Refresh Logs
+          </button>
+        </div>
+
+        <div class="ledger-table-container">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Event ID</th>
+                <th>Timestamp</th>
+                <th>Event Classification</th>
+                <th>Description</th>
+                <th>Source IP</th>
+                <th>Threat Level</th>
+              </tr>
+            </thead>
+            <tbody id="securityLogsTbody">
+              <!-- Logs populated dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="/static/js/main.js"></script>
+</body>
+</html>
